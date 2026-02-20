@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Postflow</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Switzer:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <svg width="85" height="28" viewBox="0 0 85 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M9.63867 8.66406C10.8845 8.66406 11.8716 9.04206 12.5996 9.79785C13.3276 10.5539 13.6924 11.6322 13.6924 13.0322C13.6924 13.9561 13.5449 14.8239 13.251 15.6357C12.957 16.4477 12.5437 17.1688 12.0117 17.7988C11.4797 18.4148 10.8641 18.9055 10.1641 19.2695C9.46424 19.6194 8.70825 19.7939 7.89648 19.7939C7.19651 19.7939 6.57984 19.6615 6.04785 19.3955C5.52985 19.1295 5.13807 18.7647 4.87207 18.3027C4.73139 18.0583 4.63652 17.7963 4.58594 17.5166L3.15039 23.8047H0L3.46484 8.79004H6.53125L6.16406 10.3828C6.44428 9.90737 6.83191 9.5233 7.3291 9.23145C7.98702 8.85349 8.75681 8.66411 9.63867 8.66406ZM8.33691 11.0791C7.97295 11.0791 7.62959 11.1491 7.30762 11.2891C6.99974 11.429 6.71969 11.6185 6.46777 11.8564C6.2299 12.0944 6.01981 12.3744 5.83789 12.6963C5.65595 13.0042 5.51595 13.3402 5.41797 13.7041C5.33398 14.0541 5.29199 14.4114 5.29199 14.7754C5.29205 15.5312 5.48143 16.1191 5.85938 16.5391C6.25135 16.9589 6.75518 17.1689 7.37109 17.1689C7.81894 17.1689 8.22497 17.0644 8.58887 16.8545C8.96687 16.6445 9.28869 16.3637 9.55469 16.0137C9.83465 15.6637 10.0446 15.2719 10.1846 14.8379C10.3386 14.3899 10.416 13.9346 10.416 13.4727C10.4159 12.7169 10.22 12.1289 9.82812 11.709C9.45012 11.289 8.95291 11.0791 8.33691 11.0791Z" fill="#F5F5F4"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M53.2334 19.501H50.084L52.998 6.8584H50.6719C50.1119 6.8584 49.6986 6.9853 49.4326 7.2373C49.1808 7.48927 49.0062 7.82529 48.9082 8.24512L48.7822 8.79102H50.7764L50.2305 11.1846H48.2285L46.3037 19.501H43.1543L45.0791 11.1846H40.6172L39.5449 15.8047C39.4329 16.2807 39.4814 16.638 39.6914 16.876C39.9014 17.114 40.2447 17.2324 40.7207 17.2324C41.0006 17.2324 41.2386 17.2119 41.4346 17.1699C41.6445 17.1279 41.8405 17.0784 42.0225 17.0225L41.4766 19.417C41.2666 19.5149 41.0146 19.5915 40.7207 19.6475C40.4407 19.7035 40.0974 19.7314 39.6914 19.7314C38.3616 19.7314 37.4164 19.3676 36.8564 18.6396C36.2966 17.9117 36.1706 16.8686 36.4785 15.5107L37.4756 11.1846H35.499C35.5401 11.3788 35.5604 11.5813 35.5557 11.793H32.7422C32.7562 11.555 32.6862 11.3516 32.5322 11.1836C32.3783 11.0157 32.1541 10.8896 31.8604 10.8057C31.5664 10.7217 31.209 10.6797 30.7891 10.6797C30.2151 10.6797 29.7878 10.7571 29.5078 10.9111C29.2279 11.0651 29.0879 11.2965 29.0879 11.6045C29.088 11.8283 29.1794 12.0105 29.3613 12.1504C29.5574 12.2903 29.9001 12.4444 30.3896 12.6123L32.1748 13.2207C33.0148 13.5007 33.6445 13.8935 34.0645 14.3975C34.4985 14.8875 34.7158 15.4891 34.7158 16.2031C34.7158 16.9171 34.5124 17.5468 34.1064 18.0928C33.7005 18.6247 33.1341 19.038 32.4062 19.332C31.6922 19.626 30.8517 19.7734 29.8857 19.7734C28.8779 19.7734 27.9961 19.6259 27.2402 19.332C26.4842 19.024 25.8956 18.5968 25.4756 18.0508C25.0857 17.5438 24.8849 16.9643 24.8691 16.3125C24.5517 16.9182 24.1432 17.4563 23.6396 17.9248C23.0517 18.4848 22.3585 18.926 21.5605 19.248C20.7765 19.556 19.9295 19.71 19.0195 19.71C17.9695 19.71 17.0451 19.5001 16.2471 19.0801C15.4633 18.6601 14.8548 18.0788 14.4209 17.3369C13.9869 16.5809 13.7695 15.7059 13.7695 14.7119C13.7696 13.844 13.931 13.0388 14.2529 12.2969C14.5889 11.541 15.0508 10.8897 15.6387 10.3438C16.2266 9.7839 16.9125 9.34995 17.6963 9.04199C18.4803 8.73399 19.3348 8.58008 20.2588 8.58008C21.3226 8.58011 22.2464 8.79008 23.0303 9.20996C23.8282 9.61593 24.4449 10.1897 24.8789 10.9316C25.3268 11.6595 25.5507 12.5208 25.5508 13.5146C25.5508 14.3826 25.3829 15.1952 25.0469 15.9512C25.0153 16.0222 24.9812 16.0918 24.9473 16.1611H27.6807C27.6807 16.4691 27.7721 16.735 27.9541 16.959C28.1361 17.183 28.402 17.3584 28.752 17.4844C29.1019 17.5963 29.5219 17.6523 30.0117 17.6523C30.6276 17.6523 31.0895 17.5608 31.3975 17.3789C31.7195 17.1969 31.8809 16.9311 31.8809 16.5811C31.8809 16.3431 31.7969 16.1472 31.6289 15.9932C31.4749 15.8392 31.2229 15.6992 30.873 15.5732L29.2559 15.0273C28.1639 14.6633 27.3868 14.2566 26.9248 13.8086C26.477 13.3466 26.2529 12.7728 26.2529 12.0869C26.253 11.3731 26.4489 10.7572 26.8408 10.2393C27.2327 9.70737 27.7787 9.30148 28.4785 9.02148C29.1784 8.72752 29.9977 8.58011 30.9355 8.58008C31.8594 8.58008 32.6646 8.72008 33.3506 9C34.0506 9.266 34.5973 9.64379 34.9893 10.1338C35.2341 10.4311 35.3989 10.7588 35.4854 11.1162L36.0166 8.79102H38.0273L38.5791 6.39648L42.002 5.2207L41.1729 8.79102H45.6328L45.8418 7.8877C46.1218 6.72582 46.6116 5.85067 47.3115 5.2627C48.0255 4.6747 49.0199 4.38086 50.2939 4.38086H56.7197L53.2334 19.501ZM20.0908 11.0576C19.6568 11.0576 19.2501 11.1491 18.8721 11.3311C18.5082 11.513 18.1862 11.765 17.9062 12.0869C17.6403 12.4088 17.4304 12.7868 17.2764 13.2207C17.1224 13.6547 17.0459 14.1314 17.0459 14.6494C17.046 15.4333 17.2418 16.0631 17.6338 16.5391C18.0258 17.001 18.565 17.2324 19.251 17.2324C19.6708 17.2324 20.0629 17.1409 20.4268 16.959C20.7906 16.763 21.1052 16.497 21.3711 16.1611C21.6511 15.8251 21.8685 15.4399 22.0225 15.0059C22.1904 14.5579 22.2744 14.0746 22.2744 13.5566C22.2743 12.773 22.0783 12.1644 21.6865 11.7305C21.2946 11.2825 20.7627 11.0577 20.0908 11.0576Z" fill="#F5F5F4"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M61.5654 8.58008C62.6292 8.58011 63.553 8.79008 64.3369 9.20996C65.1349 9.61593 65.7516 10.1897 66.1855 10.9316C66.6335 11.6595 66.8574 12.5208 66.8574 13.5146C66.8574 14.3826 66.6895 15.1952 66.3535 15.9512C66.0176 16.7071 65.5482 17.3648 64.9463 17.9248C64.3583 18.4848 63.6652 18.926 62.8672 19.248C62.0832 19.556 61.2362 19.71 60.3262 19.71C59.2762 19.71 58.3517 19.5001 57.5537 19.0801C56.7699 18.6601 56.1615 18.0788 55.7275 17.3369C55.2935 16.5809 55.0762 15.7059 55.0762 14.7119C55.0762 13.844 55.2376 13.0388 55.5596 12.2969C55.8956 11.541 56.3574 10.8897 56.9453 10.3438C57.5332 9.7839 58.2191 9.34995 59.0029 9.04199C59.7869 8.73399 60.6414 8.58008 61.5654 8.58008ZM61.3975 11.0576C60.9635 11.0576 60.5567 11.1491 60.1787 11.3311C59.8149 11.513 59.4928 11.765 59.2129 12.0869C58.947 12.4088 58.737 12.7868 58.583 13.2207C58.429 13.6547 58.3525 14.1314 58.3525 14.6494C58.3526 15.4333 58.5485 16.0631 58.9404 16.5391C59.3324 17.001 59.8717 17.2324 60.5576 17.2324C60.9774 17.2324 61.3695 17.1409 61.7334 16.959C62.0972 16.763 62.4118 16.497 62.6777 16.1611C62.9577 15.8251 63.1751 15.4399 63.3291 15.0059C63.4971 14.5579 63.5811 14.0746 63.5811 13.5566C63.581 12.773 63.385 12.1644 62.9932 11.7305C62.6012 11.2825 62.0693 11.0577 61.3975 11.0576Z" fill="#F5F5F4"/>
+        <path d="M70.5742 15.9658L74.2041 8.78906H77.1436L77.4863 15.9658L80.6934 8.78906H84.1162L78.3623 19.499H75.3174L74.9531 12.3418L71.2852 19.499H68.1982L67.4004 8.78906H70.6553L70.5742 15.9658Z" fill="#F5F5F4"/>
+      </svg>
+        </div>
+    <button class="close-btn" type="button" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+            </button>
+        </header>
+
+  <!-- Horizontal lines positioned with CSS - outside container for full width -->
+  <div class="grid-line grid-line-1"></div>
+  <div class="grid-line grid-line-2"></div>
+  <div class="grid-line grid-line-3"></div>
+  
+  <!-- Grid intersection plus signs -->
+  <div class="grid-intersections" aria-hidden="true"></div>
+
+  <div class="container">
+    <!-- Background Layers -->
+    <div class="bg-layer bg-grid" aria-hidden="true">
+      <!-- Vertical lines positioned dynamically -->
+      <div class="grid-line-vertical grid-line-v1"></div>
+      <div class="grid-line-vertical grid-line-v2"></div>
+      <div class="grid-line-vertical grid-line-v3"></div>
+      <div class="grid-line-vertical grid-line-v4"></div>
+      <div class="grid-line-vertical grid-line-v5"></div>
+    </div>
+    <div class="bg-layer bg-glow" aria-hidden="true">
+      <img src="assets/glow-on-top.webp" alt="" />
+    </div>
+    <div class="bg-layer bg-crosshair" aria-hidden="true"></div>
+
+    <!-- Main Content -->
+    <main class="main animate-on-load">
+      <h1 class="hero-title animate-on-load animate-delay-1">
+                Turn ideas into impact
+                <span>with Postflow</span>
+            </h1>
+
+      <div class="content-grid animate-on-load animate-delay-2">
+        <!-- Payment Form Card -->
+        <section class="card payment-card animate-on-load animate-delay-3">
+          <header class="card-header">
+            <p class="card-label">Payment Details</p>
+                    </header>
+
+                    <form class="payment-form" novalidate>
+                        <fieldset class="payment-methods">
+                            <legend>Method</legend>
+              <div class="method-options">
+                                <button type="button" class="method-option is-active" aria-pressed="true">
+                  <svg class="method-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 7C2 5.34315 3.34315 4 5 4H19C20.6567 4 22 5.34274 22 6.99975V9H2V7Z" fill="#E7E5E4"/>
+                    <path d="M2 11V17C2 18.6569 3.34315 20 5 20H19C20.6569 20 22 18.6569 22 17V11H2Z" fill="#E7E5E4"/>
+                  </svg>
+                                    <span>Card</span>
+                                </button>
+                                <button type="button" class="method-option" aria-pressed="false">
+                  <svg class="method-icon klarna-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 1C18.0751 1 23 5.92487 23 12C23 18.0751 18.0751 23 12 23C5.92487 23 1 18.0751 1 12C1 5.92487 5.92487 1 12 1ZM6 6.16797V17.835H8.67871V6.16797H6ZM12.7441 6.16797L12.7412 6.36816C12.6817 8.43653 11.7041 10.3259 10.0371 11.5742L8.99902 12.3516L13.0195 17.835H16.3262L12.626 12.7891L12.7881 12.624C14.44 10.8956 15.3633 8.61444 15.3633 6.16797H12.7441ZM18.542 14.918C18.1554 14.918 17.7842 15.0714 17.5107 15.3447C17.2373 15.6181 17.0831 15.9893 17.083 16.376C17.083 16.7628 17.2373 17.1337 17.5107 17.4072C17.7842 17.6807 18.1552 17.835 18.542 17.835C18.9286 17.8349 19.2998 17.6806 19.5732 17.4072C19.8465 17.1338 20 16.7626 20 16.376C19.9999 15.9893 19.8467 15.6181 19.5732 15.3447C19.2998 15.0713 18.9286 14.9181 18.542 14.918Z" fill="#FFA8CD"/>
+                  </svg>
+                                    <span>Klarna</span>
+                                </button>
+                            </div>
+            </fieldset>
+
+            <label class="form-field">
+              <span>Email</span>
+              <input type="email" name="email" placeholder="remco@example.com" autocomplete="email" required />
+            </label>
+
+            <!-- Klarna Payment Plans -->
+            <div class="klarna-plans" style="display: none;">
+              <p class="klarna-plans-label">Choose your payment plan</p>
+              <fieldset class="klarna-options">
+                <div class="klarna-option">
+                  <input type="radio" id="klarna-pay-now" name="klarna-plan" value="pay-now" />
+                  <label for="klarna-pay-now" class="klarna-option-label">
+                    <div class="klarna-option-content">
+                      <div class="klarna-option-text">
+                        <span class="klarna-option-title">Pay now</span>
+                        <span class="klarna-option-subtitle">Pay in full today</span>
+                      </div>
+                      <span class="klarna-badge">
+                        <svg width="50" height="12" viewBox="0 0 50 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <g clip-path="url(#clip0_11_13)">
+                            <path d="M44.879 9.79522C43.7287 9.79522 42.8321 8.85273 42.8321 7.70825C42.8321 6.56384 43.7287 5.62129 44.879 5.62129C46.0293 5.62129 46.9259 6.56384 46.9259 7.70825C46.9259 8.85273 46.0293 9.79522 44.879 9.79522ZM44.3039 12C45.285 12 46.5369 11.6297 47.2304 10.1823L47.2981 10.216C46.9936 11.007 46.9936 11.4783 46.9936 11.5961V11.7812H49.4633V3.63535H46.9936V3.82048C46.9936 3.93829 46.9936 4.40954 47.2981 5.20056L47.2304 5.23422C46.5369 3.78682 45.285 3.41655 44.3039 3.41655C41.9525 3.41655 40.2947 5.26788 40.2947 7.70825C40.2947 10.1487 41.9525 12 44.3039 12ZM35.998 3.41655C34.8815 3.41655 34.0018 3.80365 33.2913 5.23422L33.2237 5.20056C33.5282 4.40954 33.5282 3.93829 33.5282 3.82048V3.63535H31.0584V11.7812H33.5959V7.48947C33.5959 6.36185 34.2556 5.655 35.3213 5.655C36.3871 5.655 36.9115 6.26089 36.9115 7.47267V11.7812H39.4489V6.59749C39.4489 4.74614 37.9941 3.41655 35.998 3.41655ZM27.3875 5.23422L27.3199 5.20056C27.6244 4.40954 27.6244 3.93829 27.6244 3.82048V3.63535H25.1546V11.7812H27.692L27.709 7.85973C27.709 6.71531 28.3179 6.02525 29.316 6.02525C29.5867 6.02525 29.8066 6.05891 30.0603 6.12622V3.63535C28.9438 3.39972 27.9458 3.82048 27.3875 5.23422ZM19.3185 9.79522C18.1682 9.79522 17.2716 8.85273 17.2716 7.70825C17.2716 6.56384 18.1682 5.62129 19.3185 5.62129C20.4688 5.62129 21.3653 6.56384 21.3653 7.70825C21.3653 8.85273 20.4688 9.79522 19.3185 9.79522ZM18.7433 12C19.7245 12 20.9763 11.6297 21.6698 10.1823L21.7375 10.216C21.433 11.007 21.433 11.4783 21.433 11.5961V11.7812H23.9028V3.63535H21.433V3.82048C21.433 3.93829 21.433 4.40954 21.7375 5.20056L21.6698 5.23422C20.9763 3.78682 19.7245 3.41655 18.7433 3.41655C16.3919 3.41655 14.7341 5.26788 14.7341 7.70825C14.7341 10.1487 16.3919 12 18.7433 12ZM11.1986 11.7812H13.7361V0H11.1986V11.7812ZM9.3378 0H6.74962C6.74962 2.10379 5.44706 3.98878 3.46785 5.33521L2.6897 5.87378V0H0V11.7812H2.6897V5.94109L7.13869 11.7812H10.4205L6.14062 6.19353C8.08598 4.79663 9.35471 2.62552 9.3378 0Z" fill="#0A051E"/>
+                          </g>
+                          <defs>
+                            <clipPath id="clip0_11_13">
+                              <rect width="49.6364" height="12" fill="white"/>
+                            </clipPath>
+                          </defs>
+                        </svg>
+                      </span>
+                    </div>
+                  </label>
+                </div>
+                <div class="klarna-option">
+                  <input type="radio" id="klarna-pay-4" name="klarna-plan" value="pay-4" checked />
+                  <label for="klarna-pay-4" class="klarna-option-label">
+                    <div class="klarna-option-content">
+                      <div class="klarna-option-text">
+                        <span class="klarna-option-title">Pay in 4-interest-free</span>
+                        <span class="klarna-option-subtitle">Pay in 4-interest-free payments of €48</span>
+                      </div>
+                      <span class="klarna-badge">
+                        <svg width="50" height="12" viewBox="0 0 50 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <g clip-path="url(#clip0_11_13)">
+                            <path d="M44.879 9.79522C43.7287 9.79522 42.8321 8.85273 42.8321 7.70825C42.8321 6.56384 43.7287 5.62129 44.879 5.62129C46.0293 5.62129 46.9259 6.56384 46.9259 7.70825C46.9259 8.85273 46.0293 9.79522 44.879 9.79522ZM44.3039 12C45.285 12 46.5369 11.6297 47.2304 10.1823L47.2981 10.216C46.9936 11.007 46.9936 11.4783 46.9936 11.5961V11.7812H49.4633V3.63535H46.9936V3.82048C46.9936 3.93829 46.9936 4.40954 47.2981 5.20056L47.2304 5.23422C46.5369 3.78682 45.285 3.41655 44.3039 3.41655C41.9525 3.41655 40.2947 5.26788 40.2947 7.70825C40.2947 10.1487 41.9525 12 44.3039 12ZM35.998 3.41655C34.8815 3.41655 34.0018 3.80365 33.2913 5.23422L33.2237 5.20056C33.5282 4.40954 33.5282 3.93829 33.5282 3.82048V3.63535H31.0584V11.7812H33.5959V7.48947C33.5959 6.36185 34.2556 5.655 35.3213 5.655C36.3871 5.655 36.9115 6.26089 36.9115 7.47267V11.7812H39.4489V6.59749C39.4489 4.74614 37.9941 3.41655 35.998 3.41655ZM27.3875 5.23422L27.3199 5.20056C27.6244 4.40954 27.6244 3.93829 27.6244 3.82048V3.63535H25.1546V11.7812H27.692L27.709 7.85973C27.709 6.71531 28.3179 6.02525 29.316 6.02525C29.5867 6.02525 29.8066 6.05891 30.0603 6.12622V3.63535C28.9438 3.39972 27.9458 3.82048 27.3875 5.23422ZM19.3185 9.79522C18.1682 9.79522 17.2716 8.85273 17.2716 7.70825C17.2716 6.56384 18.1682 5.62129 19.3185 5.62129C20.4688 5.62129 21.3653 6.56384 21.3653 7.70825C21.3653 8.85273 20.4688 9.79522 19.3185 9.79522ZM18.7433 12C19.7245 12 20.9763 11.6297 21.6698 10.1823L21.7375 10.216C21.433 11.007 21.433 11.4783 21.433 11.5961V11.7812H23.9028V3.63535H21.433V3.82048C21.433 3.93829 21.433 4.40954 21.7375 5.20056L21.6698 5.23422C20.9763 3.78682 19.7245 3.41655 18.7433 3.41655C16.3919 3.41655 14.7341 5.26788 14.7341 7.70825C14.7341 10.1487 16.3919 12 18.7433 12ZM11.1986 11.7812H13.7361V0H11.1986V11.7812ZM9.3378 0H6.74962C6.74962 2.10379 5.44706 3.98878 3.46785 5.33521L2.6897 5.87378V0H0V11.7812H2.6897V5.94109L7.13869 11.7812H10.4205L6.14062 6.19353C8.08598 4.79663 9.35471 2.62552 9.3378 0Z" fill="#0A051E"/>
+                          </g>
+                          <defs>
+                            <clipPath id="clip0_11_13">
+                              <rect width="49.6364" height="12" fill="white"/>
+                            </clipPath>
+                          </defs>
+                        </svg>
+                      </span>
+                    </div>
+                  </label>
+                </div>
+                <div class="klarna-option">
+                  <input type="radio" id="klarna-pay-over-time" name="klarna-plan" value="pay-over-time" />
+                  <label for="klarna-pay-over-time" class="klarna-option-label">
+                    <div class="klarna-option-content">
+                      <div class="klarna-option-text">
+                        <span class="klarna-option-title">Pay over time</span>
+                        <span class="klarna-option-subtitle">Split the cost into smaller payments over 6-24 months</span>
+                      </div>
+                      <span class="klarna-badge">
+                        <svg width="50" height="12" viewBox="0 0 50 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <g clip-path="url(#clip0_11_13)">
+                            <path d="M44.879 9.79522C43.7287 9.79522 42.8321 8.85273 42.8321 7.70825C42.8321 6.56384 43.7287 5.62129 44.879 5.62129C46.0293 5.62129 46.9259 6.56384 46.9259 7.70825C46.9259 8.85273 46.0293 9.79522 44.879 9.79522ZM44.3039 12C45.285 12 46.5369 11.6297 47.2304 10.1823L47.2981 10.216C46.9936 11.007 46.9936 11.4783 46.9936 11.5961V11.7812H49.4633V3.63535H46.9936V3.82048C46.9936 3.93829 46.9936 4.40954 47.2981 5.20056L47.2304 5.23422C46.5369 3.78682 45.285 3.41655 44.3039 3.41655C41.9525 3.41655 40.2947 5.26788 40.2947 7.70825C40.2947 10.1487 41.9525 12 44.3039 12ZM35.998 3.41655C34.8815 3.41655 34.0018 3.80365 33.2913 5.23422L33.2237 5.20056C33.5282 4.40954 33.5282 3.93829 33.5282 3.82048V3.63535H31.0584V11.7812H33.5959V7.48947C33.5959 6.36185 34.2556 5.655 35.3213 5.655C36.3871 5.655 36.9115 6.26089 36.9115 7.47267V11.7812H39.4489V6.59749C39.4489 4.74614 37.9941 3.41655 35.998 3.41655ZM27.3875 5.23422L27.3199 5.20056C27.6244 4.40954 27.6244 3.93829 27.6244 3.82048V3.63535H25.1546V11.7812H27.692L27.709 7.85973C27.709 6.71531 28.3179 6.02525 29.316 6.02525C29.5867 6.02525 29.8066 6.05891 30.0603 6.12622V3.63535C28.9438 3.39972 27.9458 3.82048 27.3875 5.23422ZM19.3185 9.79522C18.1682 9.79522 17.2716 8.85273 17.2716 7.70825C17.2716 6.56384 18.1682 5.62129 19.3185 5.62129C20.4688 5.62129 21.3653 6.56384 21.3653 7.70825C21.3653 8.85273 20.4688 9.79522 19.3185 9.79522ZM18.7433 12C19.7245 12 20.9763 11.6297 21.6698 10.1823L21.7375 10.216C21.433 11.007 21.433 11.4783 21.433 11.5961V11.7812H23.9028V3.63535H21.433V3.82048C21.433 3.93829 21.433 4.40954 21.7375 5.20056L21.6698 5.23422C20.9763 3.78682 19.7245 3.41655 18.7433 3.41655C16.3919 3.41655 14.7341 5.26788 14.7341 7.70825C14.7341 10.1487 16.3919 12 18.7433 12ZM11.1986 11.7812H13.7361V0H11.1986V11.7812ZM9.3378 0H6.74962C6.74962 2.10379 5.44706 3.98878 3.46785 5.33521L2.6897 5.87378V0H0V11.7812H2.6897V5.94109L7.13869 11.7812H10.4205L6.14062 6.19353C8.08598 4.79663 9.35471 2.62552 9.3378 0Z" fill="#0A051E"/>
+                          </g>
+                          <defs>
+                            <clipPath id="clip0_11_13">
+                              <rect width="49.6364" height="12" fill="white"/>
+                            </clipPath>
+                          </defs>
+                        </svg>
+                      </span>
+                    </div>
+                  </label>
+                </div>
+              </fieldset>
+              <div class="klarna-buyer-protection" style="display: none;">
+                <span class="klarna-protection-icon"></span>
+                <span>Shop securely with buyer protection. <a href="#" class="klarna-learn-more">Learn more</a></span>
+              </div>
+            </div>
+
+                        <label class="form-field">
+                            <span>Cardholder Name</span>
+              <input type="text" name="cardholder" placeholder="John Doe" autocomplete="cc-name" required />
+                        </label>
+
+            <div class="form-row form-row-card">
+              <label class="form-field form-field-card-number">
+                            <span>Card Number</span>
+                <input type="text" name="card-number" placeholder="4242 4242 4242 4242" inputmode="numeric" autocomplete="cc-number" required />
+                        </label>
+              <div class="form-row form-row-exp-cvv">
+                            <label class="form-field">
+                                <span>Expiration</span>
+                  <input type="text" name="expiration" placeholder="MM/YY" inputmode="numeric" autocomplete="cc-exp" required />
+                            </label>
+                            <label class="form-field">
+                                <span>CVV</span>
+                  <input type="password" name="cvv" placeholder="123" inputmode="numeric" autocomplete="cc-csc" required />
+                            </label>
+              </div>
+                        </div>
+                    </form>
+                </section>
+
+        <!-- Summary Card -->
+        <section class="card summary-card animate-on-load animate-delay-4">
+          <div class="summary-header">
+            <p class="card-label">Postflow Pro</p>
+            <h2 class="summary-price">€192/year</h2>
+                        </div>
+
+                    <dl class="summary-list">
+            <div class="summary-row">
+                            <dt>Subtotal</dt>
+                            <dd>€240</dd>
+                        </div>
+            <div class="summary-row">
+              <dt>Yearly Plan Discount: 20%</dt>
+              <dd class="discount">-€48</dd>
+                        </div>
+                    </dl>
+
+                    <div class="summary-total">
+                        <span>Total</span>
+                        <span>€192</span>
+                    </div>
+
+          <button class="cta-btn" type="button">Subscribe</button>
+
+                    <p class="summary-note">
+            €192 charged today for your first year. €240 charged every 12 months thereafter while your subscription is active. Cancel anytime. All sales are final.
+                    </p>
+        </section>
+            </div>
+        </main>
+    </div>
+  <script>
+    function updateGridLines() {
+      const contentGrid = document.querySelector('.content-grid');
+      const paymentCard = document.querySelector('.payment-card');
+      const summaryCard = document.querySelector('.summary-card');
+      const gridLine2 = document.querySelector('.grid-line-2');
+      const gridLine3 = document.querySelector('.grid-line-3');
+      
+      if (contentGrid && gridLine2) {
+        const contentGridRect = contentGrid.getBoundingClientRect();
+        const scrollY = window.scrollY || window.pageYOffset;
+        // Position at the top edge of the content-grid (form + summary blocks)
+        const topPosition = contentGridRect.top + scrollY;
+        gridLine2.style.top = topPosition + 'px';
+      }
+      
+      if (paymentCard && summaryCard && gridLine3) {
+        const isMobileOrTablet = window.innerWidth <= 1024;
+        const targetCard = isMobileOrTablet ? summaryCard : paymentCard;
+        const targetRect = targetCard.getBoundingClientRect();
+        
+        // Only update if we have valid dimensions
+        if (targetRect.height > 0 && targetRect.width > 0) {
+          const scrollY = window.scrollY || window.pageYOffset;
+          gridLine3.style.top = (targetRect.top + targetRect.height + scrollY) + 'px';
+        }
+      }
+
+      // Update vertical lines: first and last follow card edges, others evenly distributed
+      if (paymentCard && summaryCard) {
+        const paymentRect = paymentCard.getBoundingClientRect();
+        const summaryRect = summaryCard.getBoundingClientRect();
+        const isMobileOrTablet = window.innerWidth <= 1024;
+        
+        const gridV1 = document.querySelector('.grid-line-v1');
+        const gridV2 = document.querySelector('.grid-line-v2');
+        const gridV3 = document.querySelector('.grid-line-v3');
+        const gridV4 = document.querySelector('.grid-line-v4');
+        const gridV5 = document.querySelector('.grid-line-v5');
+        
+        // First line at left edge of form, last at right edge of summary
+        const startX = paymentRect.left;
+        const endX = summaryRect.right;
+        const totalWidth = endX - startX;
+        // Divide space between v1 and v5 into 4 equal parts for v2, v3, v4
+        const segmentWidth = totalWidth / 4;
+        
+        if (gridV1) gridV1.style.left = startX + 'px';
+        if (gridV2) gridV2.style.left = (startX + segmentWidth) + 'px';
+        if (gridV3) gridV3.style.left = (startX + segmentWidth * 2) + 'px';
+        if (gridV4) gridV4.style.left = (startX + segmentWidth * 3) + 'px';
+        if (gridV5) gridV5.style.left = endX + 'px';
+
+        // Update intersection plus signs
+        updateGridIntersections();
+      }
+    }
+
+    function updateGridIntersections() {
+      const intersectionsContainer = document.querySelector('.grid-intersections');
+      if (!intersectionsContainer) return;
+
+      const gridLine1 = document.querySelector('.grid-line-1');
+      const gridLine2 = document.querySelector('.grid-line-2');
+      const gridLine3 = document.querySelector('.grid-line-3');
+      const gridV1 = document.querySelector('.grid-line-v1');
+      const gridV2 = document.querySelector('.grid-line-v2');
+      const gridV3 = document.querySelector('.grid-line-v3');
+      const gridV4 = document.querySelector('.grid-line-v4');
+      const gridV5 = document.querySelector('.grid-line-v5');
+
+      if (!gridLine1 || !gridLine2 || !gridLine3 || !gridV1 || !gridV5) return;
+
+      // Get positions of all lines
+      const scrollY = window.scrollY || window.pageYOffset;
+      const h1Top = parseFloat(gridLine1.style.top) || 72;
+      const h2Top = parseFloat(gridLine2.style.top) || 0;
+      const h3Top = parseFloat(gridLine3.style.top) || 0;
+      const v1Left = parseFloat(gridV1.style.left) || 0;
+      const v2Left = parseFloat(gridV2.style.left) || 0;
+      const v3Left = parseFloat(gridV3.style.left) || 0;
+      const v4Left = parseFloat(gridV4.style.left) || 0;
+      const v5Left = parseFloat(gridV5.style.left) || 0;
+
+      const horizontalLines = [h1Top, h2Top, h3Top];
+      const verticalLines = [v1Left, v2Left, v3Left, v4Left, v5Left];
+
+      // Clear existing plus signs
+      intersectionsContainer.innerHTML = '';
+
+      // Create plus signs at each intersection
+      // Account for 0.5px offset to center on 1px lines
+      horizontalLines.forEach((hPos, hIndex) => {
+        verticalLines.forEach((vPos, vIndex) => {
+          const plus = document.createElement('div');
+          plus.className = 'grid-plus';
+          // Add 0.5px to center on the 1px grid line
+          plus.style.left = (vPos + 0.5) + 'px';
+          plus.style.top = (hPos + 0.5) + 'px';
+          intersectionsContainer.appendChild(plus);
+        });
+      });
+    }
+    
+    // Payment method switching
+    function initPaymentMethodSwitching() {
+      const methodOptions = document.querySelectorAll('.method-option');
+      const methodOptionsContainer = document.querySelector('.method-options');
+      const cardholderField = document.querySelector('input[name="cardholder"]')?.closest('.form-field');
+      const formRowCard = document.querySelector('.form-row-card');
+      const klarnaPlans = document.querySelector('.klarna-plans');
+      
+      methodOptions.forEach((option, index) => {
+        option.addEventListener('click', () => {
+          const isKlarna = option.querySelector('span')?.textContent.trim() === 'Klarna';
+          
+          // Update active state
+          methodOptions.forEach(opt => {
+            opt.classList.toggle('is-active', opt === option);
+            opt.setAttribute('aria-pressed', opt === option ? 'true' : 'false');
+          });
+          
+          // Show/hide Klarna plans selector without animation to prevent blinking
+          if (klarnaPlans) {
+            if (isKlarna) {
+              klarnaPlans.style.display = 'block';
+              klarnaPlans.style.opacity = '1';
+              klarnaPlans.style.transform = 'translate3d(0, 0, 0)';
+              klarnaPlans.style.transition = 'none';
+              
+              // Initialize Klarna slider after layout is ready
+              // Ensure slider is hidden first, then position it, then show it
+              const klarnaOptionsContainer = document.querySelector('.klarna-options');
+              if (klarnaOptionsContainer) {
+                klarnaOptionsContainer.classList.remove('has-selection');
+                klarnaOptionsContainer.classList.add('slider-updating');
+              }
+              
+              requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                  // Ensure initKlarnaPlanSelection has been called
+                  if (typeof updateKlarnaSlider !== 'function') {
+                    klarnaInitFn = initKlarnaPlanSelection();
+                  }
+                  
+                  if (typeof updateKlarnaSlider === 'function') {
+                    const checkedRadio = document.querySelector('input[name="klarna-plan"]:checked');
+                    if (checkedRadio) {
+                      const klarnaRadios = document.querySelectorAll('input[name="klarna-plan"]');
+                      const checkedIndex = Array.from(klarnaRadios).indexOf(checkedRadio);
+                      
+                      // Update position (skipHide=true since we already hid it)
+                      updateKlarnaSlider(checkedIndex, true);
+                      
+                      // Show slider after position is set
+                      if (klarnaOptionsContainer) {
+                        requestAnimationFrame(() => {
+                          requestAnimationFrame(() => {
+                            klarnaOptionsContainer.classList.remove('slider-updating');
+                            klarnaOptionsContainer.classList.add('has-selection');
+                          });
+                        });
+                      }
+                    }
+                  } else if (klarnaInitFn) {
+                    klarnaInitFn();
+                  }
+                });
+              });
+            } else {
+              klarnaPlans.style.display = 'none';
+              klarnaPlans.style.opacity = '0';
+              klarnaPlans.style.transition = 'none';
+              
+              // Hide slider when hiding Klarna plans
+              const klarnaOptionsContainer = document.querySelector('.klarna-options');
+              if (klarnaOptionsContainer) {
+                klarnaOptionsContainer.classList.remove('has-selection');
+              }
+            }
+          }
+          
+          // Update grid lines after layout changes
+          setTimeout(() => {
+            updateGridLinesOptimized();
+          }, 350);
+          
+          // Show/hide card fields without animation to prevent blinking
+          if (cardholderField) {
+            if (isKlarna) {
+              cardholderField.style.display = 'none';
+              cardholderField.style.transition = 'none';
+            } else {
+              cardholderField.style.display = '';
+              cardholderField.style.opacity = '1';
+              cardholderField.style.transform = 'translate3d(0, 0, 0)';
+              cardholderField.style.transition = 'none';
+            }
+          }
+          
+          if (formRowCard) {
+            if (isKlarna) {
+              formRowCard.style.display = 'none';
+              formRowCard.style.transition = 'none';
+            } else {
+              formRowCard.style.display = '';
+              formRowCard.style.opacity = '1';
+              formRowCard.style.transform = 'translate3d(0, 0, 0)';
+              formRowCard.style.transition = 'none';
+            }
+          }
+          
+          // Update required attributes
+          const cardInputs = document.querySelectorAll('input[name="card-number"], input[name="expiration"], input[name="cvv"], input[name="cardholder"]');
+          cardInputs.forEach(input => {
+            input.required = !isKlarna;
+          });
+        });
+      });
+      
+    }
+    
+    // Klarna plan selection with sliding indicator
+    let updateKlarnaSlider; // Make it accessible globally
+    
+    function initKlarnaPlanSelection() {
+      const klarnaRadios = document.querySelectorAll('input[name="klarna-plan"]');
+      const klarnaOptionsContainer = document.querySelector('.klarna-options');
+      const klarnaOptions = document.querySelectorAll('.klarna-option');
+      const buyerProtection = document.querySelector('.klarna-buyer-protection');
+      
+      if (!klarnaOptionsContainer || klarnaOptions.length === 0) return;
+      
+      updateKlarnaSlider = function(index, skipHide) {
+        if (!klarnaOptionsContainer || !klarnaOptions[index]) return;
+        
+        const selectedOption = klarnaOptions[index];
+        const selectedLabel = selectedOption.querySelector('.klarna-option-label');
+        
+        if (selectedLabel) {
+          // Use double requestAnimationFrame to ensure layout is calculated
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              const containerRect = klarnaOptionsContainer.getBoundingClientRect();
+              const labelRect = selectedLabel.getBoundingClientRect();
+              
+              // Only update if container is visible
+              if (containerRect.width > 0 && containerRect.height > 0) {
+                // Calculate precise position and height
+                const offsetTop = labelRect.top - containerRect.top;
+                const height = labelRect.height;
+                
+                // Hide slider first to prevent any visual artifacts (unless skipHide is true)
+                if (!skipHide) {
+                  klarnaOptionsContainer.classList.remove('has-selection');
+                }
+                
+                // Temporarily disable transitions to prevent intermediate states
+                klarnaOptionsContainer.classList.add('slider-updating');
+                
+                // Set new position immediately (without transition)
+                klarnaOptionsContainer.style.setProperty('--slider-top', offsetTop + 'px');
+                klarnaOptionsContainer.style.setProperty('--slider-height', height + 'px');
+                
+                // Force a reflow to ensure position is set
+                klarnaOptionsContainer.offsetHeight;
+                
+                // Re-enable transitions and show slider after position is confirmed
+                requestAnimationFrame(() => {
+                  requestAnimationFrame(() => {
+                    klarnaOptionsContainer.classList.remove('slider-updating');
+                    if (!skipHide) {
+                      klarnaOptionsContainer.classList.add('has-selection');
+                    }
+                  });
+                });
+              }
+            });
+          });
+        }
+      };
+      
+      klarnaRadios.forEach((radio, index) => {
+        radio.addEventListener('change', () => {
+          updateKlarnaSlider(index);
+          
+          if (buyerProtection) {
+            buyerProtection.style.display = 'flex';
+          }
+        });
+      });
+      
+      // Set initial position for default selected option (only if visible)
+      function tryInitializeSlider() {
+        const checkedRadio = document.querySelector('input[name="klarna-plan"]:checked');
+        if (checkedRadio && klarnaOptionsContainer) {
+          const containerRect = klarnaOptionsContainer.getBoundingClientRect();
+          // Only initialize if container is visible
+          if (containerRect.width > 0 && containerRect.height > 0) {
+            const checkedIndex = Array.from(klarnaRadios).indexOf(checkedRadio);
+            updateKlarnaSlider(checkedIndex);
+            return true;
+          }
+        }
+        return false;
+      }
+      
+      // Try to initialize immediately
+      const checkedRadio = document.querySelector('input[name="klarna-plan"]:checked');
+      if (checkedRadio) {
+        // Try multiple times to ensure layout is ready
+        setTimeout(() => {
+          if (!tryInitializeSlider()) {
+            setTimeout(() => tryInitializeSlider(), 200);
+          }
+        }, 100);
+        setTimeout(() => tryInitializeSlider(), 300);
+        setTimeout(() => tryInitializeSlider(), 500);
+      }
+      
+      // Show buyer protection if default option is selected
+      if (checkedRadio && buyerProtection) {
+        buyerProtection.style.display = 'flex';
+      }
+      
+      // Return the function so it can be called when Klarna becomes visible
+      return tryInitializeSlider;
+    }
+    
+    // Throttle function for performance
+    function throttle(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+    
+    // Optimized grid line update with requestAnimationFrame
+    function updateGridLinesOptimized() {
+      requestAnimationFrame(() => {
+        updateGridLines();
+      });
+    }
+    
+    // Initial grid line positioning
+    function initGridLines() {
+      // Try multiple times to ensure layout is ready
+      updateGridLines();
+      
+      // Wait for fonts and images to load
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+          setTimeout(updateGridLines, 50);
+          setTimeout(updateGridLines, 150);
+          setTimeout(updateGridLines, 300);
+        });
+      } else {
+        setTimeout(updateGridLines, 100);
+        setTimeout(updateGridLines, 300);
+      }
+      
+      // Wait for all animations to complete
+      setTimeout(() => {
+        updateGridLines();
+        // Mark animations as complete
+        document.querySelectorAll('.animate-on-load').forEach(el => {
+          el.classList.add('animation-complete');
+        });
+      }, 600); // Wait for longest animation (0.4s delay + 0.3s duration)
+      
+      // Final check after a longer delay to ensure everything is stable
+      setTimeout(() => {
+        updateGridLines();
+      }, 1000);
+    }
+    
+    // Update on DOM ready and load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initGridLines);
+    } else {
+      initGridLines();
+    }
+    
+    // Initialize functions early
+    let klarnaInitFn = null;
+    
+    window.addEventListener('load', () => {
+      // Wait a bit for layout to stabilize after all resources load
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          updateGridLines();
+          // Additional check after layout has settled
+          setTimeout(updateGridLines, 100);
+          setTimeout(updateGridLines, 300);
+        });
+      });
+      
+      initPaymentMethodSwitching();
+      klarnaInitFn = initKlarnaPlanSelection(); // Store the initialization function
+    });
+    
+    // Use throttled updates for resize and scroll
+    window.addEventListener('resize', throttle(updateGridLinesOptimized, 16));
+    window.addEventListener('scroll', throttle(updateGridLinesOptimized, 16));
+  </script>
+</body>
+</html>
