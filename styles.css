@@ -208,11 +208,12 @@ body {
   top: 0;
 }
 
-/* Only while the layout is changing under them. Left on permanently, these
-   would lag behind every resize and scroll correction. */
-.grid-gliding .grid-line-2,
-.grid-gliding .grid-line-3,
-.grid-gliding .grid-plus-row {
+/* Always on. Switching a transition on in the same style change that moves
+   the element is what makes a browser skip the animation and jump instead;
+   JS suppresses this inline for corrections that must land at once. */
+.grid-line-2,
+.grid-line-3,
+.grid-plus-row {
   transition: transform var(--duration-glide) var(--ease-out);
   will-change: transform;
 }
@@ -967,6 +968,12 @@ body {
 
   .klarna-slider {
     transition: opacity var(--duration-fast) ease;
+  }
+
+  .grid-line-2,
+  .grid-line-3,
+  .grid-plus-row {
+    transition: none;
   }
 
 }

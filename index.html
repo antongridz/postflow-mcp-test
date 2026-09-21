@@ -227,7 +227,7 @@
         </main>
     </div>
   <script>
-    function updateGridLines() {
+    function updateGridLines(instant) {
       const contentGrid = document.querySelector('.content-grid');
       const paymentCard = document.querySelector('.payment-card');
       const summaryCard = document.querySelector('.summary-card');
@@ -239,7 +239,7 @@
         const scrollY = window.scrollY || window.pageYOffset;
         // Position at the top edge of the content-grid (form + summary blocks)
         gridState.h[1] = contentGridRect.top + scrollY;
-        setLineY(gridLine2, gridState.h[1]);
+        setLineY(gridLine2, gridState.h[1], instant);
       }
 
       if (paymentCard && summaryCard && gridLine3) {
@@ -251,7 +251,7 @@
         if (targetRect.height > 0 && targetRect.width > 0) {
           const scrollY = window.scrollY || window.pageYOffset;
           gridState.h[2] = targetRect.top + targetRect.height + scrollY;
-          setLineY(gridLine3, gridState.h[2]);
+          setLineY(gridLine3, gridState.h[2], instant);
         }
       }
 
@@ -287,7 +287,7 @@
         });
 
         // Update intersection plus signs
-        updateGridIntersections();
+        updateGridIntersections(instant);
       }
     }
 
@@ -296,9 +296,21 @@
     const gridState = { h: [72, 0, 0], v: [0, 0, 0, 0, 0] };
 
     // Lines and plus rows are positioned with transform rather than top, so a
-    // move is a compositor job and can be driven every frame without layout.
-    function setLineY(el, y) {
-      if (el) el.style.transform = 'translate3d(0, ' + y + 'px, 0)';
+    // move is a compositor job rather than a layout.
+    //
+    // The transition lives permanently in CSS, so a move never has to switch
+    // it on: a browser handed a new transition property and a new value in the
+    // same style change may decline to animate at all (Safari does), which
+    // shows up as an unexplained jump. Corrections that must land immediately
+    // — first paint, resize — suppress it inline for that one write instead.
+    function setLineY(el, y, instant) {
+      if (!el) return;
+      if (instant) el.style.transition = 'none';
+      el.style.transform = 'translate3d(0, ' + y + 'px, 0)';
+      if (instant) {
+        el.offsetHeight; // commit before the transition is allowed back
+        el.style.transition = '';
+      }
     }
 
     // One row of plus signs per horizontal line, built once and reused.
@@ -330,8 +342,9 @@
       return plusRows;
     }
 
-    function prefersReducedMotion() {
-      return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Every grid correction that is not a deliberate move lands instantly.
+    function updateGridLinesInstant() {
+      updateGridLines(true);
     }
 
     // Show or hide a block that changes the payment card's height.
@@ -345,34 +358,18 @@
     // Let the grid lines and their plus signs transition to wherever the new
     // layout puts them, instead of snapping. Only the transform changes, so
     // this runs on the compositor and costs the main thread one measure pass.
-    let glideTimer = null;
-
     function glideGrid() {
-      if (prefersReducedMotion()) {
-        updateGridLines();
-        return;
-      }
-
-      document.body.classList.add('grid-gliding');
-      // Flush so the transition is active in the style the move starts from;
-      // otherwise the first frame of it is dropped. updateGridLines() forces
-      // this layout anyway when it measures, so it costs nothing extra.
-      document.body.offsetHeight;
+      // No flag: this is the one caller that wants the CSS transition.
       updateGridLines();
-
-      clearTimeout(glideTimer);
-      glideTimer = setTimeout(() => {
-        document.body.classList.remove('grid-gliding');
-      }, 400);
     }
 
-    function updateGridIntersections() {
+    function updateGridIntersections(instant) {
       const rows = ensurePlusRows();
       if (!rows) return;
 
       // The 0.5px nudges centre the 5px glyph on a 1px line.
       rows.forEach((row, hIndex) => {
-        setLineY(row, gridState.h[hIndex] + 0.5);
+        setLineY(row, gridState.h[hIndex] + 0.5, instant);
         row.plusSigns.forEach((plus, vIndex) => {
           plus.style.left = (gridState.v[vIndex] + 0.5) + 'px';
         });
@@ -516,30 +513,30 @@
     // Optimized grid line update with requestAnimationFrame
     function updateGridLinesOptimized() {
       requestAnimationFrame(() => {
-        updateGridLines();
+        updateGridLines(true);
       });
     }
     
     // Initial grid line positioning
     function initGridLines() {
       // Try multiple times to ensure layout is ready
-      updateGridLines();
+      updateGridLinesInstant();
       
       // Wait for fonts and images to load
       if (document.fonts && document.fonts.ready) {
         document.fonts.ready.then(() => {
-          setTimeout(updateGridLines, 50);
-          setTimeout(updateGridLines, 150);
-          setTimeout(updateGridLines, 300);
+          setTimeout(updateGridLinesInstant, 50);
+          setTimeout(updateGridLinesInstant, 150);
+          setTimeout(updateGridLinesInstant, 300);
         });
       } else {
-        setTimeout(updateGridLines, 100);
-        setTimeout(updateGridLines, 300);
+        setTimeout(updateGridLinesInstant, 100);
+        setTimeout(updateGridLinesInstant, 300);
       }
       
       // Wait for all animations to complete
       setTimeout(() => {
-        updateGridLines();
+        updateGridLinesInstant();
         // Mark animations as complete
         document.querySelectorAll('.animate-on-load').forEach(el => {
           el.classList.add('animation-complete');
@@ -548,7 +545,7 @@
       
       // Final check after a longer delay to ensure everything is stable
       setTimeout(() => {
-        updateGridLines();
+        updateGridLines(true);
       }, 1000);
     }
     
@@ -566,10 +563,10 @@
       // Wait a bit for layout to stabilize after all resources load
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          updateGridLines();
+          updateGridLines(true);
           // Additional check after layout has settled
-          setTimeout(updateGridLines, 100);
-          setTimeout(updateGridLines, 300);
+          setTimeout(updateGridLinesInstant, 100);
+          setTimeout(updateGridLinesInstant, 300);
         });
       });
       
