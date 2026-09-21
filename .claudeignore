@@ -1,0 +1,9 @@
+node_modules/
+.vercel/
+.DS_Store
+*.lock
+package-lock.json
+skills-lock.json
+assets/*.webp
+assets/*.png
+assets/*.jpg
