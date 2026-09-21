@@ -93,6 +93,7 @@
             <div class="klarna-plans" style="display: none;">
               <p class="klarna-plans-label">Choose your payment plan</p>
               <fieldset class="klarna-options">
+                <span class="klarna-slider" aria-hidden="true"></span>
                 <div class="klarna-option">
                   <input type="radio" id="klarna-pay-now" name="klarna-plan" value="pay-now" />
                   <label for="klarna-pay-now" class="klarna-option-label">
@@ -347,70 +348,49 @@
             opt.setAttribute('aria-pressed', opt === option ? 'true' : 'false');
           });
           
-          // Show/hide Klarna plans selector without animation to prevent blinking
           if (klarnaPlans) {
             if (isKlarna) {
+              // Lay it out hidden, place the indicator while it is already
+              // measurable, then fade the whole block in on the next frame.
+              klarnaPlans.classList.add('is-entering');
+              klarnaPlans.classList.remove('is-leaving');
               klarnaPlans.style.display = 'block';
-              klarnaPlans.style.opacity = '1';
-              klarnaPlans.style.transform = 'translate3d(0, 0, 0)';
-              klarnaPlans.style.transition = 'none';
-              
-              // Initialize Klarna slider after layout is ready
-              // Ensure slider is hidden first, then position it, then show it
-              const klarnaOptionsContainer = document.querySelector('.klarna-options');
-              if (klarnaOptionsContainer) {
-                klarnaOptionsContainer.classList.remove('has-selection');
-                klarnaOptionsContainer.classList.add('slider-updating');
+
+              if (typeof updateKlarnaSlider !== 'function') {
+                klarnaInitFn = initKlarnaPlanSelection();
               }
-              
+              if (klarnaInitFn) klarnaInitFn();
+
               requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                  // Ensure initKlarnaPlanSelection has been called
-                  if (typeof updateKlarnaSlider !== 'function') {
-                    klarnaInitFn = initKlarnaPlanSelection();
-                  }
-                  
-                  if (typeof updateKlarnaSlider === 'function') {
-                    const checkedRadio = document.querySelector('input[name="klarna-plan"]:checked');
-                    if (checkedRadio) {
-                      const klarnaRadios = document.querySelectorAll('input[name="klarna-plan"]');
-                      const checkedIndex = Array.from(klarnaRadios).indexOf(checkedRadio);
-                      
-                      // Update position (skipHide=true since we already hid it)
-                      updateKlarnaSlider(checkedIndex, true);
-                      
-                      // Show slider after position is set
-                      if (klarnaOptionsContainer) {
-                        requestAnimationFrame(() => {
-                          requestAnimationFrame(() => {
-                            klarnaOptionsContainer.classList.remove('slider-updating');
-                            klarnaOptionsContainer.classList.add('has-selection');
-                          });
-                        });
-                      }
-                    }
-                  } else if (klarnaInitFn) {
-                    klarnaInitFn();
-                  }
-                });
+                klarnaPlans.classList.remove('is-entering');
               });
             } else {
-              klarnaPlans.style.display = 'none';
-              klarnaPlans.style.opacity = '0';
-              klarnaPlans.style.transition = 'none';
-              
-              // Hide slider when hiding Klarna plans
-              const klarnaOptionsContainer = document.querySelector('.klarna-options');
-              if (klarnaOptionsContainer) {
-                klarnaOptionsContainer.classList.remove('has-selection');
-              }
+              klarnaPlans.classList.add('is-leaving');
+
+              // transitionend is the signal; the timer is the safety net for
+              // when it never fires (tab backgrounded, transition cancelled).
+              let settled = false;
+              const finishHide = () => {
+                if (settled) return;
+                settled = true;
+                clearTimeout(hideTimer);
+                klarnaPlans.removeEventListener('transitionend', onEnd);
+                klarnaPlans.style.display = 'none';
+                klarnaPlans.classList.remove('is-leaving');
+                const container = document.querySelector('.klarna-options');
+                if (container) container.classList.remove('has-selection');
+                updateGridLinesOptimized();
+              };
+              const onEnd = (event) => {
+                if (event.target !== klarnaPlans || event.propertyName !== 'opacity') return;
+                finishHide();
+              };
+              const hideTimer = setTimeout(finishHide, 250);
+              klarnaPlans.addEventListener('transitionend', onEnd);
             }
           }
-          
-          // Update grid lines after layout changes
-          setTimeout(() => {
-            updateGridLinesOptimized();
-          }, 350);
+
+          updateGridLinesOptimized();
           
           // Show/hide card fields without animation to prevent blinking
           if (cardholderField) {
@@ -458,53 +438,38 @@
       
       if (!klarnaOptionsContainer || klarnaOptions.length === 0) return;
       
-      updateKlarnaSlider = function(index, skipHide) {
-        if (!klarnaOptionsContainer || !klarnaOptions[index]) return;
-        
-        const selectedOption = klarnaOptions[index];
-        const selectedLabel = selectedOption.querySelector('.klarna-option-label');
-        
-        if (selectedLabel) {
-          // Use double requestAnimationFrame to ensure layout is calculated
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              const containerRect = klarnaOptionsContainer.getBoundingClientRect();
-              const labelRect = selectedLabel.getBoundingClientRect();
-              
-              // Only update if container is visible
-              if (containerRect.width > 0 && containerRect.height > 0) {
-                // Calculate precise position and height
-                const offsetTop = labelRect.top - containerRect.top;
-                const height = labelRect.height;
-                
-                // Hide slider first to prevent any visual artifacts (unless skipHide is true)
-                if (!skipHide) {
-                  klarnaOptionsContainer.classList.remove('has-selection');
-                }
-                
-                // Temporarily disable transitions to prevent intermediate states
-                klarnaOptionsContainer.classList.add('slider-updating');
-                
-                // Set new position immediately (without transition)
-                klarnaOptionsContainer.style.setProperty('--slider-top', offsetTop + 'px');
-                klarnaOptionsContainer.style.setProperty('--slider-height', height + 'px');
-                
-                // Force a reflow to ensure position is set
-                klarnaOptionsContainer.offsetHeight;
-                
-                // Re-enable transitions and show slider after position is confirmed
-                requestAnimationFrame(() => {
-                  requestAnimationFrame(() => {
-                    klarnaOptionsContainer.classList.remove('slider-updating');
-                    if (!skipHide) {
-                      klarnaOptionsContainer.classList.add('has-selection');
-                    }
-                  });
-                });
-              }
-            });
-          });
+      // Move the indicator to the option at `index`.
+      // Rows are equal height (grid-auto-rows: 1fr), so the indicator only
+      // ever translates — no resize, no layout, straight to the compositor.
+      // `place` drops it in position without animating, for first paint.
+      updateKlarnaSlider = function(index, place) {
+        const slider = klarnaOptionsContainer.querySelector('.klarna-slider');
+        const selectedLabel = klarnaOptions[index] &&
+          klarnaOptions[index].querySelector('.klarna-option-label');
+
+        if (!slider || !selectedLabel) return false;
+
+        const containerRect = klarnaOptionsContainer.getBoundingClientRect();
+        const labelRect = selectedLabel.getBoundingClientRect();
+
+        // Container is hidden (display: none) — nothing to measure yet.
+        if (containerRect.height === 0 || labelRect.height === 0) return false;
+
+        const offsetTop = labelRect.top - containerRect.top;
+
+        if (place) slider.classList.add('is-placing');
+
+        slider.style.height = labelRect.height + 'px';
+        slider.style.transform = 'translate3d(0, ' + offsetTop + 'px, 0)';
+
+        if (place) {
+          // Commit the untransitioned position, then re-arm the transition.
+          slider.offsetHeight;
+          slider.classList.remove('is-placing');
         }
+
+        klarnaOptionsContainer.classList.add('has-selection');
+        return true;
       };
       
       klarnaRadios.forEach((radio, index) => {
@@ -517,34 +482,16 @@
         });
       });
       
-      // Set initial position for default selected option (only if visible)
+      // Drop the indicator onto the default option, without animating.
+      // Returns false while the container is still hidden.
       function tryInitializeSlider() {
         const checkedRadio = document.querySelector('input[name="klarna-plan"]:checked');
-        if (checkedRadio && klarnaOptionsContainer) {
-          const containerRect = klarnaOptionsContainer.getBoundingClientRect();
-          // Only initialize if container is visible
-          if (containerRect.width > 0 && containerRect.height > 0) {
-            const checkedIndex = Array.from(klarnaRadios).indexOf(checkedRadio);
-            updateKlarnaSlider(checkedIndex);
-            return true;
-          }
-        }
-        return false;
+        if (!checkedRadio) return false;
+        return updateKlarnaSlider(Array.from(klarnaRadios).indexOf(checkedRadio), true);
       }
-      
-      // Try to initialize immediately
+
       const checkedRadio = document.querySelector('input[name="klarna-plan"]:checked');
-      if (checkedRadio) {
-        // Try multiple times to ensure layout is ready
-        setTimeout(() => {
-          if (!tryInitializeSlider()) {
-            setTimeout(() => tryInitializeSlider(), 200);
-          }
-        }, 100);
-        setTimeout(() => tryInitializeSlider(), 300);
-        setTimeout(() => tryInitializeSlider(), 500);
-      }
-      
+
       // Show buyer protection if default option is selected
       if (checkedRadio && buyerProtection) {
         buyerProtection.style.display = 'flex';
@@ -598,7 +545,7 @@
         document.querySelectorAll('.animate-on-load').forEach(el => {
           el.classList.add('animation-complete');
         });
-      }, 600); // Wait for longest animation (0.4s delay + 0.3s duration)
+      }, 600); // Longest entrance: 0.2s delay + 0.32s duration
       
       // Final check after a longer delay to ensure everything is stable
       setTimeout(() => {
@@ -631,8 +578,17 @@
       klarnaInitFn = initKlarnaPlanSelection(); // Store the initialization function
     });
     
+    // Row heights change with the viewport, so re-place the indicator too —
+    // without animating, since this is a layout correction, not a selection.
+    function repositionKlarnaSlider() {
+      if (klarnaInitFn) klarnaInitFn();
+    }
+
     // Use throttled updates for resize and scroll
-    window.addEventListener('resize', throttle(updateGridLinesOptimized, 16));
+    window.addEventListener('resize', throttle(() => {
+      updateGridLinesOptimized();
+      repositionKlarnaSlider();
+    }, 16));
     window.addEventListener('scroll', throttle(updateGridLinesOptimized, 16));
   </script>
 </body>
