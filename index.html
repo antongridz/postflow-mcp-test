@@ -51,15 +51,15 @@
     <div class="bg-layer bg-crosshair" aria-hidden="true"></div>
 
     <!-- Main Content -->
-    <main class="main animate-on-load">
-      <h1 class="hero-title animate-on-load animate-delay-1">
+    <main class="main">
+      <h1 class="hero-title animate-on-load">
                 Turn ideas into impact
                 <span>with Postflow</span>
             </h1>
 
-      <div class="content-grid animate-on-load animate-delay-2">
+      <div class="content-grid">
         <!-- Payment Form Card -->
-        <section class="card payment-card animate-on-load animate-delay-3">
+        <section class="card payment-card animate-on-load animate-delay-2">
           <header class="card-header">
             <p class="card-label">Payment Details</p>
                     </header>
@@ -195,7 +195,7 @@
                 </section>
 
         <!-- Summary Card -->
-        <section class="card summary-card animate-on-load animate-delay-4">
+        <section class="card summary-card animate-on-load animate-delay-3">
           <div class="summary-header">
             <p class="card-label">Postflow Pro</p>
             <h2 class="summary-price">€192/year</h2>
@@ -541,7 +541,7 @@
         document.querySelectorAll('.animate-on-load').forEach(el => {
           el.classList.add('animation-complete');
         });
-      }, 600); // Longest entrance: 0.2s delay + 0.32s duration
+      }, 500); // Longest entrance: 0.1s delay + 0.32s duration, plus buffer
       
       // Final check after a longer delay to ensure everything is stable
       setTimeout(() => {

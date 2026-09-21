@@ -72,20 +72,15 @@
   will-change: auto;
 }
 
-.animate-delay-1 {
+/* Only elements that actually paint something get a delay — a wrapper with
+   no background or border has nothing to fade in, and staggering it just
+   multiplies its opacity ramp into its children's. */
+.animate-delay-2 {
   animation-delay: 0.05s;
 }
 
-.animate-delay-2 {
-  animation-delay: 0.1s;
-}
-
 .animate-delay-3 {
-  animation-delay: 0.15s;
-}
-
-.animate-delay-4 {
-  animation-delay: 0.2s;
+  animation-delay: 0.1s;
 }
 
 * {
