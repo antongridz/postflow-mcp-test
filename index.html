@@ -334,121 +334,36 @@
       return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     }
 
-    // While the card is resizing, the grid lines that track it have to follow
-    // frame by frame. A CSS transition on the lines themselves would only
-    // approximate the card's real edge and drift from it mid-flight, leaving
-    // the line visibly detached from the card it is supposed to mark.
-    let gridTrackToken = 0;
-
-    function trackGridWhileSettling() {
-      const token = ++gridTrackToken;
-      const started = performance.now();
-      // Long enough to outlast the height transition plus its safety net.
-      const duration = prefersReducedMotion() ? 0 : 400;
-
-      const tick = () => {
-        if (token !== gridTrackToken) return;
-        updateGridLines();
-        if (performance.now() - started < duration) requestAnimationFrame(tick);
-      };
-
-      requestAnimationFrame(tick);
+    // Show or hide a block that changes the payment card's height.
+    // The change itself is instant: animating height means a full layout every
+    // frame, and the card is not what the eye follows here — the grid line
+    // below it is, and that one glides (see glideGrid).
+    function setBlockVisible(el, visible) {
+      if (el) el.style.display = visible ? '' : 'none';
     }
 
-    // Run `cb` once el's height transition has settled, with a timer for when
-    // transitionend never arrives (backgrounded tab, cancelled transition).
-    function afterHeightSettles(el, cb) {
-      let done = false;
+    // Let the grid lines and their plus signs transition to wherever the new
+    // layout puts them, instead of snapping. Only the transform changes, so
+    // this runs on the compositor and costs the main thread one measure pass.
+    let glideTimer = null;
 
-      const finish = () => {
-        if (done) return;
-        done = true;
-        clearTimeout(guard);
-        el.removeEventListener('transitionend', onEnd);
-        cb();
-      };
-
-      const onEnd = (event) => {
-        if (event.target === el && event.propertyName === 'height') finish();
-      };
-
-      const guard = setTimeout(finish, 600);
-      el.addEventListener('transitionend', onEnd);
-    }
-
-    // Expand or collapse a block by animating its own height, so whatever
-    // measures the card's edge sees one continuous movement.
-    // `beforeMeasure` runs while the block is laid out but still collapsed —
-    // the only moment its contents are measurable but not yet visible.
-    function setBlockExpanded(el, expanded, onSettled, beforeMeasure) {
-      if (!el) return;
-
-      el.classList.add('js-collapsible');
-
+    function glideGrid() {
       if (prefersReducedMotion()) {
-        el.style.height = '';
-        el.style.display = expanded ? '' : 'none';
-        el.classList.toggle('is-collapsed', !expanded);
-        el.classList.remove('is-sizing');
-        if (beforeMeasure && expanded) beforeMeasure();
-        if (onSettled) onSettled();
+        updateGridLines();
         return;
       }
 
-      el.classList.add('is-sizing');
+      document.body.classList.add('grid-gliding');
+      // Flush so the transition is active in the style the move starts from;
+      // otherwise the first frame of it is dropped. updateGridLines() forces
+      // this layout anyway when it measures, so it costs nothing extra.
+      document.body.offsetHeight;
+      updateGridLines();
 
-      // A zero-height flex item still occupies its share of the parent's gap,
-      // which would vanish in one frame when the block finally goes display:
-      // none. Cancel it with a negative margin that animates alongside height.
-      const gap = parseFloat(getComputedStyle(el.parentElement).rowGap) || 0;
-
-      if (expanded) {
-        el.style.display = '';
-        el.style.height = '';
-        el.style.marginBottom = '';
-        el.classList.remove('is-collapsed');
-
-        if (beforeMeasure) beforeMeasure();
-
-        const fullHeight = el.getBoundingClientRect().height;
-        el.style.height = '0px';
-        el.style.marginBottom = -gap + 'px';
-        el.classList.add('is-collapsed');
-        el.offsetHeight; // commit the collapsed state
-
-        requestAnimationFrame(() => {
-          el.classList.remove('is-collapsed');
-          el.style.height = fullHeight + 'px';
-          el.style.marginBottom = '';
-          afterHeightSettles(el, () => {
-            // Back to auto, so the block can reflow later on its own.
-            el.style.height = '';
-            el.classList.remove('is-sizing');
-            if (onSettled) onSettled();
-          });
-        });
-      } else {
-        if (getComputedStyle(el).display === 'none') return;
-
-        el.style.height = el.getBoundingClientRect().height + 'px';
-        el.style.marginBottom = '';
-        el.offsetHeight; // commit the pinned height
-
-        requestAnimationFrame(() => {
-          el.classList.add('is-collapsed');
-          el.style.height = '0px';
-          el.style.marginBottom = -gap + 'px';
-          afterHeightSettles(el, () => {
-            // Both the negative margin and the gap it cancelled disappear
-            // together, so the layout does not shift on the last frame.
-            el.style.display = 'none';
-            el.style.height = '';
-            el.style.marginBottom = '';
-            el.classList.remove('is-sizing');
-            if (onSettled) onSettled();
-          });
-        });
-      }
+      clearTimeout(glideTimer);
+      glideTimer = setTimeout(() => {
+        document.body.classList.remove('grid-gliding');
+      }, 400);
     }
 
     function updateGridIntersections() {
@@ -482,27 +397,24 @@
             opt.setAttribute('aria-pressed', opt === option ? 'true' : 'false');
           });
           
-          // Every block that changes the card's height collapses by its own
-          // height, so the grid lines below the card see one continuous
-          // movement instead of three competing jumps.
-          setBlockExpanded(klarnaPlans, isKlarna, () => {
-            if (!isKlarna) {
-              const container = document.querySelector('.klarna-options');
-              if (container) container.classList.remove('has-selection');
-            }
-          }, () => {
-            // Measured while the panel is laid out but still collapsed.
+          // The card's own fields change instantly; only the grid below it
+          // animates.
+          setBlockVisible(klarnaPlans, isKlarna);
+          setBlockVisible(cardholderField, !isKlarna);
+          setBlockVisible(formRowCard, !isKlarna);
+
+          if (isKlarna) {
             if (typeof updateKlarnaSlider !== 'function') {
               klarnaInitFn = initKlarnaPlanSelection();
             }
             if (klarnaInitFn) klarnaInitFn();
-          });
+          } else {
+            const container = document.querySelector('.klarna-options');
+            if (container) container.classList.remove('has-selection');
+          }
 
-          setBlockExpanded(cardholderField, !isKlarna);
-          setBlockExpanded(formRowCard, !isKlarna);
-
-          // Drive the grid off the card's real edge for the whole switch.
-          trackGridWhileSettling();
+          // The card resized in one frame; let the grid lines glide to it.
+          glideGrid();
 
           // Update required attributes
           const cardInputs = document.querySelectorAll('input[name="card-number"], input[name="expiration"], input[name="cvv"], input[name="cardholder"]');

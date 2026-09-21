@@ -21,6 +21,9 @@
   --duration-fast: 0.2s;
   --duration-normal: 0.22s;
   --duration-slow: 0.32s;
+  /* The grid trails a layout change that already happened, so it wants to
+     catch up faster than a normal transition. */
+  --duration-glide: 0.18s;
 
   /* Strong ease-out: instant movement where the eye is watching */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -162,7 +165,6 @@ body {
   left: 0;
   right: 0;
   height: 0;
-  will-change: transform;
 }
 
 .grid-plus {
@@ -204,6 +206,14 @@ body {
 .grid-line-2,
 .grid-line-3 {
   top: 0;
+}
+
+/* Only while the layout is changing under them. Left on permanently, these
+   would lag behind every resize and scroll correction. */
+.grid-gliding .grid-line-2,
+.grid-gliding .grid-line-3,
+.grid-gliding .grid-plus-row {
+  transition: transform var(--duration-glide) var(--ease-out);
   will-change: transform;
 }
 
@@ -520,27 +530,8 @@ body {
   border-top: 1px solid var(--stone-800);
 }
 
-/* Blocks that change the payment card's height are collapsed by animating
-   their own height, so the grid lines below the card move continuously
-   instead of jumping. Applied from JS via setBlockExpanded(). */
-.js-collapsible {
-  opacity: 1;
-  transition: opacity var(--duration-normal) var(--ease-out),
-              height var(--duration-normal) var(--ease-out),
-              margin-bottom var(--duration-normal) var(--ease-out);
-}
 
-/* Height is driven from a measured value, so the block has to be clipped
-   while it resizes. */
-.js-collapsible.is-sizing {
-  overflow: hidden;
-}
 
-/* The block's own growth is the motion; opacity just keeps content from
-   showing before there is room for it. */
-.js-collapsible.is-collapsed {
-  opacity: 0;
-}
 
 .klarna-plans-label {
   margin: 0 0 12px 0;
@@ -978,11 +969,6 @@ body {
     transition: opacity var(--duration-fast) ease;
   }
 
-  /* Blocks open and close at once; JS skips the height animation to match,
-     so the grid lines land in one step too. */
-  .js-collapsible {
-    transition: opacity var(--duration-fast) ease;
-  }
 }
 
 @keyframes fadeIn {
