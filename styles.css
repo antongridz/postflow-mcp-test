@@ -155,8 +155,19 @@ body {
   z-index: 1;
 }
 
+/* Carries the Y of one horizontal line; the plus signs inside carry only X. */
+.grid-plus-row {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0;
+  will-change: transform;
+}
+
 .grid-plus {
   position: absolute;
+  top: 0;
   width: 5px;
   height: 5px;
   transform: translate(-50%, -50%);
@@ -189,14 +200,11 @@ body {
   top: 72px; /* Between header (72px) and title start (104px) */
 }
 
-.grid-line-2 {
-  /* Positioned dynamically by JavaScript */
-  top: 0;
-}
-
+/* Both are moved by JS via transform, so top stays at the origin. */
+.grid-line-2,
 .grid-line-3 {
-  /* Positioned dynamically by JavaScript */
   top: 0;
+  will-change: transform;
 }
 
 .bg-glow {
@@ -510,23 +518,28 @@ body {
   margin-top: 0px;
   padding-top: 16px;
   border-top: 1px solid var(--stone-800);
+}
+
+/* Blocks that change the payment card's height are collapsed by animating
+   their own height, so the grid lines below the card move continuously
+   instead of jumping. Applied from JS via setBlockExpanded(). */
+.js-collapsible {
   opacity: 1;
-  transform: translate3d(0, 0, 0);
   transition: opacity var(--duration-normal) var(--ease-out),
-              transform var(--duration-normal) var(--ease-out);
+              height var(--duration-normal) var(--ease-out),
+              margin-bottom var(--duration-normal) var(--ease-out);
 }
 
-/* Enter and exit are asymmetric on purpose: the system answers faster
-   than it offers. */
-.klarna-plans.is-entering {
-  opacity: 0;
-  transform: translate3d(0, 4px, 0);
+/* Height is driven from a measured value, so the block has to be clipped
+   while it resizes. */
+.js-collapsible.is-sizing {
+  overflow: hidden;
 }
 
-.klarna-plans.is-leaving {
+/* The block's own growth is the motion; opacity just keeps content from
+   showing before there is room for it. */
+.js-collapsible.is-collapsed {
   opacity: 0;
-  transform: translate3d(0, 4px, 0);
-  transition-duration: 0.15s;
 }
 
 .klarna-plans-label {
@@ -965,10 +978,10 @@ body {
     transition: opacity var(--duration-fast) ease;
   }
 
-  .klarna-plans,
-  .klarna-plans.is-entering,
-  .klarna-plans.is-leaving {
-    transform: none;
+  /* Blocks open and close at once; JS skips the height animation to match,
+     so the grid lines land in one step too. */
+  .js-collapsible {
+    transition: opacity var(--duration-fast) ease;
   }
 }
 

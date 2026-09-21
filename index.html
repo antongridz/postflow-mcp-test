@@ -238,19 +238,20 @@
         const contentGridRect = contentGrid.getBoundingClientRect();
         const scrollY = window.scrollY || window.pageYOffset;
         // Position at the top edge of the content-grid (form + summary blocks)
-        const topPosition = contentGridRect.top + scrollY;
-        gridLine2.style.top = topPosition + 'px';
+        gridState.h[1] = contentGridRect.top + scrollY;
+        setLineY(gridLine2, gridState.h[1]);
       }
-      
+
       if (paymentCard && summaryCard && gridLine3) {
         const isMobileOrTablet = window.innerWidth <= 1024;
         const targetCard = isMobileOrTablet ? summaryCard : paymentCard;
         const targetRect = targetCard.getBoundingClientRect();
-        
+
         // Only update if we have valid dimensions
         if (targetRect.height > 0 && targetRect.width > 0) {
           const scrollY = window.scrollY || window.pageYOffset;
-          gridLine3.style.top = (targetRect.top + targetRect.height + scrollY) + 'px';
+          gridState.h[2] = targetRect.top + targetRect.height + scrollY;
+          setLineY(gridLine3, gridState.h[2]);
         }
       }
 
@@ -273,59 +274,192 @@
         // Divide space between v1 and v5 into 4 equal parts for v2, v3, v4
         const segmentWidth = totalWidth / 4;
         
-        if (gridV1) gridV1.style.left = startX + 'px';
-        if (gridV2) gridV2.style.left = (startX + segmentWidth) + 'px';
-        if (gridV3) gridV3.style.left = (startX + segmentWidth * 2) + 'px';
-        if (gridV4) gridV4.style.left = (startX + segmentWidth * 3) + 'px';
-        if (gridV5) gridV5.style.left = endX + 'px';
+        gridState.v = [
+          startX,
+          startX + segmentWidth,
+          startX + segmentWidth * 2,
+          startX + segmentWidth * 3,
+          endX,
+        ];
+
+        [gridV1, gridV2, gridV3, gridV4, gridV5].forEach((line, i) => {
+          if (line) line.style.left = gridState.v[i] + 'px';
+        });
 
         // Update intersection plus signs
         updateGridIntersections();
       }
     }
 
-    function updateGridIntersections() {
-      const intersectionsContainer = document.querySelector('.grid-intersections');
-      if (!intersectionsContainer) return;
+    // Where the grid currently sits, in document coordinates.
+    // h[0] is static (see .grid-line-1 in CSS); h[1] and h[2] track the cards.
+    const gridState = { h: [72, 0, 0], v: [0, 0, 0, 0, 0] };
 
-      const gridLine1 = document.querySelector('.grid-line-1');
-      const gridLine2 = document.querySelector('.grid-line-2');
-      const gridLine3 = document.querySelector('.grid-line-3');
-      const gridV1 = document.querySelector('.grid-line-v1');
-      const gridV2 = document.querySelector('.grid-line-v2');
-      const gridV3 = document.querySelector('.grid-line-v3');
-      const gridV4 = document.querySelector('.grid-line-v4');
-      const gridV5 = document.querySelector('.grid-line-v5');
+    // Lines and plus rows are positioned with transform rather than top, so a
+    // move is a compositor job and can be driven every frame without layout.
+    function setLineY(el, y) {
+      if (el) el.style.transform = 'translate3d(0, ' + y + 'px, 0)';
+    }
 
-      if (!gridLine1 || !gridLine2 || !gridLine3 || !gridV1 || !gridV5) return;
+    // One row of plus signs per horizontal line, built once and reused.
+    // The row carries the Y; each plus only ever carries its own X. That way
+    // a horizontal line moving means writing three transforms, not rebuilding
+    // fifteen nodes.
+    let plusRows = null;
 
-      // Get positions of all lines
-      const scrollY = window.scrollY || window.pageYOffset;
-      const h1Top = parseFloat(gridLine1.style.top) || 72;
-      const h2Top = parseFloat(gridLine2.style.top) || 0;
-      const h3Top = parseFloat(gridLine3.style.top) || 0;
-      const v1Left = parseFloat(gridV1.style.left) || 0;
-      const v2Left = parseFloat(gridV2.style.left) || 0;
-      const v3Left = parseFloat(gridV3.style.left) || 0;
-      const v4Left = parseFloat(gridV4.style.left) || 0;
-      const v5Left = parseFloat(gridV5.style.left) || 0;
+    function ensurePlusRows() {
+      if (plusRows) return plusRows;
 
-      const horizontalLines = [h1Top, h2Top, h3Top];
-      const verticalLines = [v1Left, v2Left, v3Left, v4Left, v5Left];
+      const container = document.querySelector('.grid-intersections');
+      if (!container) return null;
 
-      // Clear existing plus signs
-      intersectionsContainer.innerHTML = '';
-
-      // Create plus signs at each intersection
-      // Account for 0.5px offset to center on 1px lines
-      horizontalLines.forEach((hPos, hIndex) => {
-        verticalLines.forEach((vPos, vIndex) => {
+      container.innerHTML = '';
+      plusRows = gridState.h.map(() => {
+        const row = document.createElement('div');
+        row.className = 'grid-plus-row';
+        row.plusSigns = gridState.v.map(() => {
           const plus = document.createElement('div');
           plus.className = 'grid-plus';
-          // Add 0.5px to center on the 1px grid line
-          plus.style.left = (vPos + 0.5) + 'px';
-          plus.style.top = (hPos + 0.5) + 'px';
-          intersectionsContainer.appendChild(plus);
+          row.appendChild(plus);
+          return plus;
+        });
+        container.appendChild(row);
+        return row;
+      });
+
+      return plusRows;
+    }
+
+    function prefersReducedMotion() {
+      return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    }
+
+    // While the card is resizing, the grid lines that track it have to follow
+    // frame by frame. A CSS transition on the lines themselves would only
+    // approximate the card's real edge and drift from it mid-flight, leaving
+    // the line visibly detached from the card it is supposed to mark.
+    let gridTrackToken = 0;
+
+    function trackGridWhileSettling() {
+      const token = ++gridTrackToken;
+      const started = performance.now();
+      // Long enough to outlast the height transition plus its safety net.
+      const duration = prefersReducedMotion() ? 0 : 400;
+
+      const tick = () => {
+        if (token !== gridTrackToken) return;
+        updateGridLines();
+        if (performance.now() - started < duration) requestAnimationFrame(tick);
+      };
+
+      requestAnimationFrame(tick);
+    }
+
+    // Run `cb` once el's height transition has settled, with a timer for when
+    // transitionend never arrives (backgrounded tab, cancelled transition).
+    function afterHeightSettles(el, cb) {
+      let done = false;
+
+      const finish = () => {
+        if (done) return;
+        done = true;
+        clearTimeout(guard);
+        el.removeEventListener('transitionend', onEnd);
+        cb();
+      };
+
+      const onEnd = (event) => {
+        if (event.target === el && event.propertyName === 'height') finish();
+      };
+
+      const guard = setTimeout(finish, 600);
+      el.addEventListener('transitionend', onEnd);
+    }
+
+    // Expand or collapse a block by animating its own height, so whatever
+    // measures the card's edge sees one continuous movement.
+    // `beforeMeasure` runs while the block is laid out but still collapsed —
+    // the only moment its contents are measurable but not yet visible.
+    function setBlockExpanded(el, expanded, onSettled, beforeMeasure) {
+      if (!el) return;
+
+      el.classList.add('js-collapsible');
+
+      if (prefersReducedMotion()) {
+        el.style.height = '';
+        el.style.display = expanded ? '' : 'none';
+        el.classList.toggle('is-collapsed', !expanded);
+        el.classList.remove('is-sizing');
+        if (beforeMeasure && expanded) beforeMeasure();
+        if (onSettled) onSettled();
+        return;
+      }
+
+      el.classList.add('is-sizing');
+
+      // A zero-height flex item still occupies its share of the parent's gap,
+      // which would vanish in one frame when the block finally goes display:
+      // none. Cancel it with a negative margin that animates alongside height.
+      const gap = parseFloat(getComputedStyle(el.parentElement).rowGap) || 0;
+
+      if (expanded) {
+        el.style.display = '';
+        el.style.height = '';
+        el.style.marginBottom = '';
+        el.classList.remove('is-collapsed');
+
+        if (beforeMeasure) beforeMeasure();
+
+        const fullHeight = el.getBoundingClientRect().height;
+        el.style.height = '0px';
+        el.style.marginBottom = -gap + 'px';
+        el.classList.add('is-collapsed');
+        el.offsetHeight; // commit the collapsed state
+
+        requestAnimationFrame(() => {
+          el.classList.remove('is-collapsed');
+          el.style.height = fullHeight + 'px';
+          el.style.marginBottom = '';
+          afterHeightSettles(el, () => {
+            // Back to auto, so the block can reflow later on its own.
+            el.style.height = '';
+            el.classList.remove('is-sizing');
+            if (onSettled) onSettled();
+          });
+        });
+      } else {
+        if (getComputedStyle(el).display === 'none') return;
+
+        el.style.height = el.getBoundingClientRect().height + 'px';
+        el.style.marginBottom = '';
+        el.offsetHeight; // commit the pinned height
+
+        requestAnimationFrame(() => {
+          el.classList.add('is-collapsed');
+          el.style.height = '0px';
+          el.style.marginBottom = -gap + 'px';
+          afterHeightSettles(el, () => {
+            // Both the negative margin and the gap it cancelled disappear
+            // together, so the layout does not shift on the last frame.
+            el.style.display = 'none';
+            el.style.height = '';
+            el.style.marginBottom = '';
+            el.classList.remove('is-sizing');
+            if (onSettled) onSettled();
+          });
+        });
+      }
+    }
+
+    function updateGridIntersections() {
+      const rows = ensurePlusRows();
+      if (!rows) return;
+
+      // The 0.5px nudges centre the 5px glyph on a 1px line.
+      rows.forEach((row, hIndex) => {
+        setLineY(row, gridState.h[hIndex] + 0.5);
+        row.plusSigns.forEach((plus, vIndex) => {
+          plus.style.left = (gridState.v[vIndex] + 0.5) + 'px';
         });
       });
     }
@@ -348,75 +482,28 @@
             opt.setAttribute('aria-pressed', opt === option ? 'true' : 'false');
           });
           
-          if (klarnaPlans) {
-            if (isKlarna) {
-              // Lay it out hidden, place the indicator while it is already
-              // measurable, then fade the whole block in on the next frame.
-              klarnaPlans.classList.add('is-entering');
-              klarnaPlans.classList.remove('is-leaving');
-              klarnaPlans.style.display = 'block';
-
-              if (typeof updateKlarnaSlider !== 'function') {
-                klarnaInitFn = initKlarnaPlanSelection();
-              }
-              if (klarnaInitFn) klarnaInitFn();
-
-              requestAnimationFrame(() => {
-                klarnaPlans.classList.remove('is-entering');
-              });
-            } else {
-              klarnaPlans.classList.add('is-leaving');
-
-              // transitionend is the signal; the timer is the safety net for
-              // when it never fires (tab backgrounded, transition cancelled).
-              let settled = false;
-              const finishHide = () => {
-                if (settled) return;
-                settled = true;
-                clearTimeout(hideTimer);
-                klarnaPlans.removeEventListener('transitionend', onEnd);
-                klarnaPlans.style.display = 'none';
-                klarnaPlans.classList.remove('is-leaving');
-                const container = document.querySelector('.klarna-options');
-                if (container) container.classList.remove('has-selection');
-                updateGridLinesOptimized();
-              };
-              const onEnd = (event) => {
-                if (event.target !== klarnaPlans || event.propertyName !== 'opacity') return;
-                finishHide();
-              };
-              const hideTimer = setTimeout(finishHide, 250);
-              klarnaPlans.addEventListener('transitionend', onEnd);
+          // Every block that changes the card's height collapses by its own
+          // height, so the grid lines below the card see one continuous
+          // movement instead of three competing jumps.
+          setBlockExpanded(klarnaPlans, isKlarna, () => {
+            if (!isKlarna) {
+              const container = document.querySelector('.klarna-options');
+              if (container) container.classList.remove('has-selection');
             }
-          }
+          }, () => {
+            // Measured while the panel is laid out but still collapsed.
+            if (typeof updateKlarnaSlider !== 'function') {
+              klarnaInitFn = initKlarnaPlanSelection();
+            }
+            if (klarnaInitFn) klarnaInitFn();
+          });
 
-          updateGridLinesOptimized();
-          
-          // Show/hide card fields without animation to prevent blinking
-          if (cardholderField) {
-            if (isKlarna) {
-              cardholderField.style.display = 'none';
-              cardholderField.style.transition = 'none';
-            } else {
-              cardholderField.style.display = '';
-              cardholderField.style.opacity = '1';
-              cardholderField.style.transform = 'translate3d(0, 0, 0)';
-              cardholderField.style.transition = 'none';
-            }
-          }
-          
-          if (formRowCard) {
-            if (isKlarna) {
-              formRowCard.style.display = 'none';
-              formRowCard.style.transition = 'none';
-            } else {
-              formRowCard.style.display = '';
-              formRowCard.style.opacity = '1';
-              formRowCard.style.transform = 'translate3d(0, 0, 0)';
-              formRowCard.style.transition = 'none';
-            }
-          }
-          
+          setBlockExpanded(cardholderField, !isKlarna);
+          setBlockExpanded(formRowCard, !isKlarna);
+
+          // Drive the grid off the card's real edge for the whole switch.
+          trackGridWhileSettling();
+
           // Update required attributes
           const cardInputs = document.querySelectorAll('input[name="card-number"], input[name="expiration"], input[name="cvv"], input[name="cardholder"]');
           cardInputs.forEach(input => {
